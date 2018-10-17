@@ -30,4 +30,8 @@ proc coverage_showcase*(x, y: int): bool =
     
     true
 
-
+proc one_equals_true*(x: int): bool =
+    if x == 1:
+        true
+    else:
+        false

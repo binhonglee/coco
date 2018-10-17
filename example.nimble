@@ -20,16 +20,11 @@ task coverage, "Generate code coverage report":
     removeSuffix(nimcache,"_d") # numcacheDir() adds _d to the path, why?
     # remove past code coverage report
     exec "rm -rf *.info coverage " & nimcache
-    # compile test files
-    for file in listFiles("tests"):
-      exec "echo compile " & file
-      exec "nim --debugger:native --passC:--coverage --passL:--coverage c " & file
+    # compile test files, recursive, start with folder tests/
+    exec "nimble compile_for_coverage tests"
     exec "lcov --base-directory . --directory " & nimcache & " --zerocounters -q"
     # run and capture 
-    for file in listFiles("tests"):
-      if endsWith(file, "nim") != true:
-        echo "running.. " & file  
-        exec "./" & file
+    exec "nimble run_for_coverage tests"
     exec "lcov --base-directory . --directory " & nimcache & " -c -o lcov.info"
     # keep only relevant coverage informations
     exec "lcov --extract lcov.info \"" & thisDir() & "*\" -o lcov.info"
@@ -39,3 +34,18 @@ task coverage, "Generate code coverage report":
 
   else:
     echo("  --> `tests` folder is missing. It's required in order to generate the code coverage report.")
+
+task compile_for_coverage, "Compile tests files for code coverage":
+    let target_dir = paramStr(2)
+    for file in listFiles(target_dir):
+        exec "nim --debugger:native --passC:--coverage --passL:--coverage c " & file
+    for dir in listDirs(target_dir):
+        exec "nimble compile_for_coverage " & dir
+
+task run_for_coverage, "Run tests for code coverage":
+    let target_dir = paramStr(2)
+    for file in listFiles(target_dir):
+        if endsWith(file, "nim") != true:
+            exec "./" & file
+    for dir in listDirs(target_dir):
+        exec "nimble run_for_coverage " & dir

@@ -17,9 +17,9 @@ To check the report, open the file `coverage/index.html` in your browser:
 
 ## How to make it work with your project?
 
-Copy the task `coverage`in `example.nimble` and paste it in your own Nimble file.
+Copy all the tasks in `example.nimble` and paste it in your own Nimble file.
 
-This Nimble task will loop over your files in `tests/`, compile in coverage mode and run the tests automatically.
+This Nimble task will loop recursively over your files in `tests/`, compile in coverage mode and run the tests automatically.
 
 **If you don't have unit tests: tweak the task to make it work with your project.**
 
@@ -37,7 +37,7 @@ This task has only been tested under MacOSX. Feel free to open a pull request to
 
 ## TODO
 
-- [ ] Support for subdirectories in tests/
+- [x] Support for subdirectories in tests/
 - [ ] Coveralls.io integration
 
 ## Dependencies
