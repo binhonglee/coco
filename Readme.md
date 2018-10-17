@@ -3,21 +3,23 @@
 This repo is showcasing how to code coverage your Nim project using LCOV through a nimble task.
 ___
 
-## Usage
+## Usage example
 
 Clone this repo and run:
 
 `nimble coverage`
 
-It will generate a `lcov.info`file on your project root folder and create a report under `coverage/`. 
+It will generate a `lcov.info` file at the root folder and create a report under `coverage/`. 
 
-To check your report, open the file `coverage/index.html`in your browser:
+To check the report, open the file `coverage/index.html` in your browser:
 
 ![d3ee404a.png](attachments/d3ee404a.png)
 
-## How does it work?
+## How to make it work with your project?
 
-This Nimble task will loop over the files in `tests/`, compile in coverage mode and run the tests automatically.
+Copy the task `coverage`in `example.nimble` and paste it in your own Nimble file.
+
+This Nimble task will loop over your files in `tests/`, compile in coverage mode and run the tests automatically.
 
 **If you don't have unit tests: tweak the task to make it work with your project.**
 
