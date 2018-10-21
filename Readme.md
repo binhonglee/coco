@@ -1,35 +1,68 @@
-# Code coverage Nimble task
+![43c4b9c5.png](attachments/43c4b9c5.png)
 
-This repo is showcasing how to code coverage your Nim project using LCOV through a nimble task.
+> Code coverage for Nim using LCOV.
 ___
 
-## Usage example
+## Features
 
-Clone this repo and run:
+* Line & Branch coverage support
+* Forward nim compiler options
+* Works out-of-the box with Nim unittests
+* API + CLI
+* HTML report
 
-`nimble coverage`
 
-It will generate a `lcov.info` file at the root folder and create a report under `coverage/`. 
+## Installation & usage
 
-To check the report, open the file `coverage/index.html` in your browser:
+Install using [Nimble](https://github.com/nim-lang/nimble):
 
-![d3ee404a.png](attachments/d3ee404a.png)
+```shell
+nimble install https://github.com/samuelroy/coco
+```
 
-## How to make it work with your project?
+### CLI
 
-Copy all the tasks in `example.nimble` and paste it in your own Nimble file.
+Generate a code coverage report:
 
-This Nimble task will loop recursively over your files in `tests/`, compile in coverage mode and run the tests automatically.
+```shell
+coco --target "tests/**/*.nim" --cov '!tests' --compiler="--hints:off" 
+```
 
-**If you don't have unit tests: tweak the task to make it work with your project.**
+The flag `--target` tells Coco to run and compile nim files in the `tests/` directory (and subdirectories if any).
+
+The flag `--cov` is helpful for extracting or removing data from the file `*.info`. Here we don't want code coverage for our tests, only for our main library `coco`.
+
+The flag `--compiler` forwards its value directly to the Nim compiler.
+
+**To get the full list of available flags, type in your shell `coco -h`**
+___
+By default, Coco will generate a `lcov.info` file on your project root folder and create a report under `coverage/`. 
+
+To check your report, open the file `coverage/index.html`in your browser:
+
+![a74b8ce4.png](attachments/a74b8ce4.png)
 
 ## VScode visualization
 
-Install [Coverage Gutters - Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=ryanluker.vscode-coverage-gutters).
+Install [Coverage Gutters](https://marketplace.visualstudio.com/items?itemName=ryanluker.vscode-coverage-gutters).
 
 This nice plugin will map your coverage to your source code right into VScode:
 
-![2774df53.png](attachments/2774df53.png)
+![b5193c3c.png](attachments/b5193c3c.png)
+
+### Library
+
+import and use:
+
+```nim
+import coco
+
+discard coverage(target = "tests/foo.nim", branch = true)
+
+```
+
+You can find the full documentation here: [API Coco](https://samuelroy.github.io/coco/)
+
 
 ## Tests
 

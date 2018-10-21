@@ -1,0 +1,232 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - lcov.info - nim-coverage/coco.nim</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">nim-coverage</a> - coco.nim<span style="font-size: 80%;"> (source / <a href="coco.nim.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">lcov.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">191</td>
+            <td class="headerCovTableEntry">219</td>
+            <td class="headerCovTableEntryMed">87.2 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2018-10-21 17:27:55</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">13</td>
+            <td class="headerCovTableEntry">13</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : ## This module is the API behind the binary Coco.</a>
+<span class="lineNum">       2 </span>            : ##
+<span class="lineNum">       3 </span>            : ## Coco makes line or branch code coverage for Nim a breeze. 
+<span class="lineNum">       4 </span>            : ##      - Depends on LCOV
+<span class="lineNum">       5 </span>            : ##      - Generates a nice looking HTML report
+<span class="lineNum">       6 </span>            : ##      - Works with visualization tools like Coverage Gutters on VSCode.
+<span class="lineNum">       7 </span>            : 
+<a name="8"><span class="lineNum">       8 </span>            : import glob, strutils, os, strformat, sequtils</a>
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : proc is_successful(ret: int): bool =
+<span class="lineNum">      11 </span><span class="lineCov">         22 :     if ret == 0:</span>
+<span class="lineNum">      12 </span><span class="lineCov">         22 :         true</span>
+<span class="lineNum">      13 </span><span class="lineCov">         22 :     else:</span>
+<a name="14"><span class="lineNum">      14 </span>            :         false</a>
+<span class="lineNum">      15 </span><span class="lineNoCov">          0 : </span>
+<span class="lineNum">      16 </span>            : proc exit_on_fail(success: bool): void {.discardable.} =
+<a name="17"><span class="lineNum">      17 </span><span class="lineCov">         66 :     if not success:</span></a>
+<span class="lineNum">      18 </span><span class="lineNoCov">          0 :         quit(&quot;Command line failed. Coco exited.&quot;)</span>
+<span class="lineNum">      19 </span>            : proc exec(command: string): void {.discardable.} =
+<span class="lineNum">      20 </span><span class="lineCov">         22 :     ## Wrapper around execShellCmd that exits if the command fail</span>
+<span class="lineNum">      21 </span><span class="lineCov">         44 :     execShellCmd(command)</span>
+<span class="lineNum">      22 </span><span class="lineCov">         44 :     .is_successful()</span>
+<a name="23"><span class="lineNum">      23 </span><span class="lineCov">         22 :     .exit_on_fail()</span></a>
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span>            : proc get_cache_folder*(filename, nimcache: string, increment=0): string =
+<a name="26"><span class="lineNum">      26 </span><span class="lineCov">         52 :     &amp;&quot;{nimcache}/{filename}_{increment}_cov&quot;</span></a>
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span>            : proc compile*(target=&quot;tests/**/*.nim&quot;, nimcache=&quot;nimcache&quot;, verbose=false, options= &quot;&quot;) =
+<span class="lineNum">      29 </span><span class="lineCov">          6 :     ## Compiles Nim files in coverage mode</span>
+<span class="lineNum">      30 </span>            :     ##      - target should be a Glob with a .nim extension
+<span class="lineNum">      31 </span><span class="lineCov">          5 :     var nim_args = &quot;--hints:off&quot;</span>
+<span class="lineNum">      32 </span><span class="lineCov">          7 :     if verbose:</span>
+<span class="lineNum">      33 </span><span class="lineCov">          1 :         nim_args = &quot;&quot;</span>
+<span class="lineNum">      34 </span><span class="lineCov">         16 :     if options.len &gt; 0:</span>
+<span class="lineNum">      35 </span><span class="lineCov">          2 :         nim_args &amp;= &amp;&quot; {options}&quot;</span>
+<span class="lineNum">      36 </span>            : 
+<span class="lineNum">      37 </span><span class="lineCov">          4 :     var i = 0 # used to avoid name folder conflicts</span>
+<span class="lineNum">      38 </span>            :     for nimfile in walkGlob(target):
+<span class="lineNum">      39 </span><span class="lineCov">          4 :         var cache_folder = </span>
+<span class="lineNum">      40 </span>            :             nimfile
+<span class="lineNum">      41 </span><span class="lineCov">          4 :             .extractFilename()</span>
+<span class="lineNum">      42 </span>            :             .get_cache_folder(nimcache, i)
+<span class="lineNum">      43 </span>            : 
+<span class="lineNum">      44 </span><span class="lineCov">         28 :         exec(&amp;&quot;nim {nim_args} --nimcache={cache_folder} --debugger:native --passC:--coverage --passL:--coverage c &quot; &amp; nimfile)</span>
+<a name="45"><span class="lineNum">      45 </span><span class="lineCov">          4 :         i.inc()</span></a>
+<span class="lineNum">      46 </span>            : 
+<span class="lineNum">      47 </span><span class="lineCov">          4 : proc reset_coverage*(source=&quot;lcov.info&quot;, path=&quot;coverage&quot;, nimcache=&quot;nimcache&quot;) =</span>
+<span class="lineNum">      48 </span><span class="lineCov">          3 :     ## Removes everything generated by a past code coverage generation:</span>
+<span class="lineNum">      49 </span>            :     ##      - Nimcache folder
+<span class="lineNum">      50 </span><span class="lineCov">          4 :     ##      - .info</span>
+<span class="lineNum">      51 </span>            :     ##      - Code coverage report folder
+<a name="52"><span class="lineNum">      52 </span><span class="lineCov">         17 :     exec(&amp;&quot;rm -rf {source} {path} {nimcache}&quot;)</span></a>
+<span class="lineNum">      53 </span>            : 
+<span class="lineNum">      54 </span><span class="lineCov">          4 : proc trace*(target: string) = </span>
+<span class="lineNum">      55 </span><span class="lineCov">          3 :     ## Runs the compiled Nim files to produce coverage informations.</span>
+<span class="lineNum">      56 </span><span class="lineNoCov">          0 :     ##      - target should be a Glob with a .nim extension.</span>
+<span class="lineNum">      57 </span>            :     
+<span class="lineNum">      58 </span>            :     for nimfile in walkGlob(target):
+<span class="lineNum">      59 </span><span class="lineCov">          3 :         var bin = nimfile</span>
+<span class="lineNum">      60 </span><span class="lineCov">          3 :         removeSuffix(bin, &quot;.nim&quot;)</span>
+<a name="61"><span class="lineNum">      61 </span><span class="lineCov">          9 :         exec(&quot;./&quot; &amp; bin)</span></a>
+<span class="lineNum">      62 </span><span class="lineCov">          3 : </span>
+<span class="lineNum">      63 </span>            : proc build_lcov_args(verbose=false, branch=false): string =
+<span class="lineNum">      64 </span><span class="lineCov">          7 :     ## Simple LCOV arguments wrapper</span>
+<span class="lineNum">      65 </span><span class="lineCov">          4 :     var lcov_args = &quot;--quiet&quot;</span>
+<span class="lineNum">      66 </span><span class="lineCov">          6 :     if verbose:</span>
+<span class="lineNum">      67 </span><span class="lineCov">          5 :         lcov_args = &quot;&quot;</span>
+<span class="lineNum">      68 </span><span class="lineCov">          6 :     if branch:</span>
+<span class="lineNum">      69 </span><span class="lineCov">          8 :         lcov_args &amp;= &quot; --rc lcov_branch_coverage=1&quot;</span>
+<a name="70"><span class="lineNum">      70 </span>            :     lcov_args</a>
+<span class="lineNum">      71 </span><span class="lineCov">          7 : </span>
+<span class="lineNum">      72 </span><span class="lineNoCov">          0 : proc cleanup_report*(fileinfo = &quot;lcov.info&quot;, cov: string, verbose=false, branch=false) =</span>
+<span class="lineNum">      73 </span><span class="lineCov">          2 :     ## Keeps only relevant coverage informations</span>
+<span class="lineNum">      74 </span>            :     ##      Without any cleanup, your code coverage report will include standard libraries, tests and so on.
+<span class="lineNum">      75 </span>            :     
+<span class="lineNum">      76 </span><span class="lineCov">          2 :     var lcov_args = build_lcov_args(verbose, branch)</span>
+<span class="lineNum">      77 </span><span class="lineCov">          2 :     var options: GlobOptions = {GlobOption.Directories, GlobOption.Absolute}</span>
+<span class="lineNum">      78 </span>            :     
+<span class="lineNum">      79 </span>            :     # Remove standard lib and nimble pkgs informations
+<span class="lineNum">      80 </span><span class="lineCov">          2 :     var currentFolder = absolutePath(&quot;&quot;)</span>
+<span class="lineNum">      81 </span><span class="lineCov">          8 :     exec(&amp;&quot;&quot;&quot;lcov {lcov_args} --extract {fileinfo} &quot;{currentFolder}*&quot; -o {fileinfo}&quot;&quot;&quot;)</span>
+<span class="lineNum">      82 </span>            : 
+<span class="lineNum">      83 </span>            :     for pattern in cov.split(&quot;,&quot;):
+<span class="lineNum">      84 </span><span class="lineCov">          2 :         if pattern.startsWith(&quot;!&quot;):</span>
+<span class="lineNum">      85 </span><span class="lineCov">          2 :             var pattern_noprefix = pattern</span>
+<span class="lineNum">      86 </span><span class="lineCov">          2 :             removePrefix(pattern_noprefix, &quot;!&quot;)</span>
+<span class="lineNum">      87 </span><span class="lineCov">          2 :             for path in walkGlob(pattern_noprefix, &quot;&quot;, options):</span>
+<span class="lineNum">      88 </span><span class="lineCov">         16 :                 exec(&amp;&quot;&quot;&quot;lcov {lcov_args} --remove {fileinfo} &quot;{path}*&quot; -o {fileinfo}&quot;&quot;&quot;)</span>
+<span class="lineNum">      89 </span>            :         else:
+<span class="lineNum">      90 </span>            :             for path in walkGlob(pattern, &quot;&quot;, options):
+<a name="91"><span class="lineNum">      91 </span><span class="lineNoCov">          0 :                 exec(&amp;&quot;&quot;&quot;lcov {lcov_args} --extract {fileinfo} &quot;{path}*&quot; -o {fileinfo}&quot;&quot;&quot;)</span></a>
+<span class="lineNum">      92 </span>            : 
+<span class="lineNum">      93 </span>            : proc genhtml*(source=&quot;lcov.info&quot;, path=&quot;coverage&quot;, verbose=false, branch=false) =
+<span class="lineNum">      94 </span><span class="lineCov">          2 :     ## Generates the HTML code coverage report from a .info file generated by LCOV</span>
+<span class="lineNum">      95 </span><span class="lineCov">          2 :     var lcov_args = &quot;--quiet&quot;</span>
+<span class="lineNum">      96 </span><span class="lineCov">          3 :     if verbose:</span>
+<span class="lineNum">      97 </span><span class="lineCov">          1 :         lcov_args = &quot;&quot;</span>
+<span class="lineNum">      98 </span><span class="lineCov">          3 :     if branch:</span>
+<span class="lineNum">      99 </span><span class="lineCov">          1 :         lcov_args &amp;= &quot; --branch-coverage&quot;</span>
+<span class="lineNum">     100 </span>            :     ## Generate LCOV Html report
+<a name="101"><span class="lineNum">     101 </span><span class="lineCov">          6 :     exec(&amp;&quot;genhtml {lcov_args} -o {path} {source}&quot;)</span></a>
+<span class="lineNum">     102 </span>            : 
+<span class="lineNum">     103 </span>            : proc coverage*(target=&quot;tests/**/*.nim&quot;, cov=&quot;!tests&quot;, verbose=false, branch=false, nimcache=&quot;nimcache&quot;, report_source=&quot;lcov.info&quot;, report_path=&quot;coverage&quot;, compiler=&quot;&quot;): int =
+<span class="lineNum">     104 </span><span class="lineCov">          2 :     ## ____</span>
+<span class="lineNum">     105 </span>            :     ## 
+<span class="lineNum">     106 </span>            :     ## Code coverage for Nim:
+<span class="lineNum">     107 </span>            :     ##      1. Clean up past reports
+<span class="lineNum">     108 </span>            :     ##      2. Compile nim files in coverage mode
+<span class="lineNum">     109 </span>            :     ##      3. Run the the executables
+<span class="lineNum">     110 </span>            :     ##      4. Capture, produce and cleanup LCOV .info file
+<span class="lineNum">     111 </span>            :     ##      5. Generate the HTML report
+<span class="lineNum">     112 </span>            :     ##
+<span class="lineNum">     113 </span><span class="lineCov">          2 :     reset_coverage(report_source, report_path, nimcache)</span>
+<span class="lineNum">     114 </span>            : 
+<span class="lineNum">     115 </span><span class="lineCov">          2 :     var targets = target.split(&quot;,&quot;)</span>
+<span class="lineNum">     116 </span>            :     for target in targets:
+<span class="lineNum">     117 </span><span class="lineCov">          2 :         compile(target, nimcache, verbose, compiler)</span>
+<span class="lineNum">     118 </span>            :     
+<span class="lineNum">     119 </span><span class="lineCov">          2 :     var lcov_args = build_lcov_args(verbose, branch)</span>
+<span class="lineNum">     120 </span>            : 
+<span class="lineNum">     121 </span><span class="lineCov">          6 :     exec(&amp;&quot;lcov {lcov_args} --base-directory . --directory {nimcache} --zerocounters -q&quot;)</span>
+<span class="lineNum">     122 </span><span class="lineCov">          2 :     for target in targets:</span>
+<span class="lineNum">     123 </span><span class="lineCov">          2 :         trace(target)</span>
+<span class="lineNum">     124 </span>            :    
+<span class="lineNum">     125 </span><span class="lineCov">          6 :     exec(&amp;&quot;lcov {lcov_args}  --base-directory . --directory {nimcache} -c -o {report_source}&quot;)</span>
+<span class="lineNum">     126 </span>            : 
+<span class="lineNum">     127 </span><span class="lineCov">          2 :     cleanup_report(report_source, cov, verbose, branch)</span>
+<span class="lineNum">     128 </span><span class="lineCov">          2 :     genhtml(report_source, report_path, verbose, branch)</span>
+<a name="129"><span class="lineNum">     129 </span>            : </a>
+<span class="lineNum">     130 </span><span class="lineCov">          2 :     result = 0</span>
+<span class="lineNum">     131 </span>            : 
+<span class="lineNum">     132 </span>            : 
+<span class="lineNum">     133 </span><span class="lineCov">          2 : when isMainModule:</span>
+<span class="lineNum">     134 </span>            :     import cligen
+<a name="135"><span class="lineNum">     135 </span><span class="lineCov">          1 :     var helpOptions = {</span></a>
+<span class="lineNum">     136 </span>            :         &quot;target&quot;: &quot;Nim files to compile and run in coverage mode. Support glob patterns.&quot;,
+<span class="lineNum">     137 </span>            :         &quot;cov&quot;: &quot;Path to folders and files you want in your code coverage report. Default takes your current directory and excludes your tests/ folder.&quot;,
+<span class="lineNum">     138 </span><span class="lineCov">          2 :         &quot;verbose&quot;: &quot;Displays every traces from LCOV and Nim&quot;</span>
+<span class="lineNum">     139 </span>            :     }
+<span class="lineNum">     140 </span>            :     dispatch(coverage, 
+<span class="lineNum">     141 </span>            :         help = {
+<span class="lineNum">     142 </span>            :         &quot;target&quot;: &quot;Nim files to compile and run in coverage mode. Direct path or glob patterns.&quot;,
+<span class="lineNum">     143 </span>            :         &quot;cov&quot;: &quot;Path to folders and files you want in your code coverage report. Default takes your current directory and excludes tests/ folder. Support glob patterns. &quot;,
+<span class="lineNum">     144 </span>            :         &quot;verbose&quot;: &quot;Displays all traces coming from LCOV and Nim&quot;,
+<span class="lineNum">     145 </span>            :         &quot;branch&quot;: &quot;Enables LCOV branch code coverage mode&quot;,
+<span class="lineNum">     146 </span>            :         &quot;nimcache&quot;: &quot;Nimcache path used by the Nim compiler&quot;,
+<span class="lineNum">     147 </span>            :         &quot;report_source&quot;: &quot;Path used by LCOV to generate the file .info&quot;,
+<span class="lineNum">     148 </span>            :         &quot;report_path&quot;: &quot;Folder path where the HTML code coverage report will be created&quot;,
+<span class="lineNum">     149 </span>            :         &quot;compiler&quot;: &quot;Forward your parameter(s) to the Nim compiler&quot;
+<span class="lineNum">     150 </span>            :         },
+<span class="lineNum">     151 </span>            :         short = {
+<span class="lineNum">     152 </span>            :         &quot;report_source&quot;: 's',
+<span class="lineNum">     153 </span>            :         &quot;report_path&quot;: 'p',
+<span class="lineNum">     154 </span>            :         &quot;compiler&quot;: 'o'
+<span class="lineNum">     155 </span>            :         }
+<span class="lineNum">     156 </span>            :     ) 
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>
