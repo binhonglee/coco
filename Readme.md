@@ -6,7 +6,7 @@ ___
 ## Features
 
 * Line & Branch coverage support
-* Forward nim compiler options
+* Forwards nim compiler options
 * Works out-of-the box with Nim unittests
 * API + CLI
 * HTML report
