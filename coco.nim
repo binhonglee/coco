@@ -11,20 +11,9 @@ const nimcache_default = "nimcache"
 const fileinfo = "lcov.info"
 const report_path = "coverage"
 
-proc is_successful(ret: int): bool =
-    if ret == 0:
-        true
-    else:
-        false
-
-proc exit_on_fail(success: bool): void {.discardable.} =
-    if not success:
-        quit("Command line failed. Coco exited.")
-proc exec(command: string): void {.discardable.} =
+proc exec(command: string) =
     ## Wrapper around execShellCmd that exits if the command fail
-    execShellCmd(command)
-    .is_successful()
-    .exit_on_fail()
+    doAssert execShellCmd(command) == 0, "command failed: " & command
 
 proc get_cache_folder*(filename, nimcache: string, increment=0): string =
     fmt"{nimcache}/{filename}_{increment}_cov"
