@@ -58,7 +58,9 @@ proc trace*(target: string) =
     for nimfile in walkGlob(target):
         var bin = nimfile
         removeSuffix(bin, ".nim")
-        exec("./" & bin)
+        exec(&"./{bin}")
+        # cleanup after execution
+        exec(&"rm {bin}")
 
 proc build_lcov_args(verbose=false, branch=false): string =
     ## Simple LCOV arguments wrapper
