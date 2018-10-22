@@ -9,7 +9,7 @@ suite "Compiles Nim files in coverage mode":
         var default_cache_folder = get_cache_folder(filename, nimcache, 0)
         var base_filename = &"{default_cache_folder}/coco_{basename}.c"
     teardown:
-        discard execShellCmd(&"rm -rf *.info coverage/ {nimcache}")
+        discard execShellCmd(&"rm -rf {nimcache}")
 
     test "Get cache folder from filename":
         ## Cache folder path pattern is <nimcache>/<filename>_<increment>_cov
