@@ -9,7 +9,7 @@ license       = "MIT"
 bin = @["coco"]
 
 
-skipDirs = @["tests"]
+skipDirs = @["tests","tests/report"]
 installExt = @["nim"]
 
 
@@ -22,5 +22,5 @@ requires "glob"
 
 task coverage, "Generate code coverage report":
   echo "Generate code coverage report"
-  exec "coco"
+  exec "./coco"
 
