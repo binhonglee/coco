@@ -5,37 +5,37 @@ suite "Compiles Nim files in coverage mode":
     setup:
         var nimcache = "tests_nimcache"
         var basename = "foo"
-        var filename = &"{basename}.nim"
+        var filename = fmt"{basename}.nim"
         var default_cache_folder = get_cache_folder(filename, nimcache, 0)
-        var base_filename = &"{default_cache_folder}/coco_{basename}.c"
+        var base_filename = fmt"{default_cache_folder}/coco_{basename}.c"
     teardown:
-        discard execShellCmd(&"rm -rf {nimcache}")
+        removeDir(nimcache)
 
     test "Get cache folder from filename":
         ## Cache folder path pattern is <nimcache>/<filename>_<increment>_cov
         check:
-            get_cache_folder(filename, nimcache, 0) == &"{nimcache}/{filename}_0_cov"
+            get_cache_folder(filename, nimcache, 0) == fmt"{nimcache}/{filename}_0_cov"
 
     test "Each compiled file should have its own folder in nimcache":
         
-        compile(&"tests/{filename}", nimcache)
+        compile(fmt"tests/{filename}", nimcache)
         
         check:
-            execShellCmd(&"ls {default_cache_folder}") == 0
-            execShellCmd(&"ls {base_filename}") == 0
-            execShellCmd(&"ls {base_filename}.gcno") == 0
+            existsDir(default_cache_folder) == true
+            existsFile(base_filename) == true
+            existsFile(fmt"{base_filename}.gcno") == true
     
     test "One should be able to pass parameters to the compiler":
 
-        compile(&"tests/{filename}", nimcache, options = "--hints:off")
+        compile(fmt"tests/{filename}", nimcache, options = "--hints:off")
         
         check:
-            execShellCmd(&"ls {default_cache_folder}") == 0
-            execShellCmd(&"ls {base_filename}") == 0
-            execShellCmd(&"ls {base_filename}.gcno") == 0
+            existsDir(default_cache_folder) == true
+            existsFile(base_filename) == true
+            existsFile(fmt"{base_filename}.gcno") == true
 
     test "Running a compiled file in coverage mode should generate .gdca files":
-        trace(&"tests/{filename}")
+        trace(fmt"tests/{filename}")
 
         check:
-            execShellCmd(&"ls {base_filename}.gcda") == 0
+            existsFile(fmt"{base_filename}.gcda") == true
