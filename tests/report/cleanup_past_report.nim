@@ -1,4 +1,4 @@
-import unittest, os, strformat, ../../coco
+import unittest, os, system, strformat, ../../coco
 
 suite "Removes past code coverage reports and data":
 
@@ -8,20 +8,23 @@ suite "Removes past code coverage reports and data":
         var coverage = "tests_coverage"
 
         var basename = "foo"
-        var filename = &"{basename}.nim"
+        var filename = fmt"{basename}.nim"
         var default_cache_folder = get_cache_folder(filename, nimcache, 0)
-        var base_filename = &"{default_cache_folder}/coco_{basename}.c"
+        var base_filename = fmt"{default_cache_folder}/coco_{basename}.c"
     
     teardown:
-        discard execShellCmd(&"rm -rf {fileinfo} {coverage} {nimcache}")
+        removeDir(coverage)
+        removeDir(nimcache)
+        removeFile(fileinfo)
     
     test "Cleanup custom locations:":
         # create custom locations
-        discard execShellCmd(&"mkdir {coverage} {nimcache}")
-        discard execShellCmd(&"touch {fileinfo}")
+        createDir(coverage)
+        createDir(nimcache)
+        writeFile(fileinfo, "")
 
         reset_coverage(fileinfo, coverage, nimcache)
         check:
-            execShellCmd(&"ls {fileinfo}") == 1
-            execShellCmd(&"ls {coverage}") == 1
-            execShellCmd(&"ls {nimcache}") == 1
+            existsDir(coverage) == false
+            existsDir(nimcache) == false
+            existsFile(fileinfo) == false
