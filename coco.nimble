@@ -15,7 +15,7 @@ skipDirs = @["tests"]
 
 # Deps
 
-requires "nim >= 0.18.1"
+requires "nim >= 0.19.0"
 requires "cligen"
 requires "glob"
 
