@@ -10,6 +10,7 @@ bin = @["coco"]
 
 
 skipDirs = @["tests"]
+installExt = @["nim"]
 
 
 
