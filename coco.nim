@@ -133,11 +133,7 @@ proc coverage*(target="tests/**/*.nim", cov="!tests", verbose=false, branch=fals
 
 when isMainModule:
     import cligen
-    var helpOptions = {
-        "target": "Nim files to compile and run in coverage mode. Support glob patterns.",
-        "cov": "Path to folders and files you want in your code coverage report. Default takes your current directory and excludes your tests/ folder.",
-        "verbose": "Displays every traces from LCOV and Nim"
-    }
+
     dispatch(coverage, 
         help = {
         "target": "Nim files to compile and run in coverage mode. Direct path or glob patterns.",
