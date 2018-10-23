@@ -3,13 +3,13 @@ import unittest, glob, os, strformat, ../../coco
 suite "Generate code coverage report":
 
     setup:
-        var fileinfo = "report.info"
-        var coverage = "tests_coverage"
-        var nimcache = "tests_nimcache_report"
-        var basename = "foo"
-        var filename = fmt"{basename}.nim"
-        var default_cache_folder = get_cache_folder(filename, nimcache, 0)
-        var base_filename = fmt"{default_cache_folder}/coco_{basename}.c"
+        const fileinfo = "report.info"
+        const coverage = "tests_coverage"
+        const nimcache = "tests_nimcache_report"
+        const basename = "foo"
+        const filename = fmt"{basename}.nim"
+        const default_cache_folder = get_cache_folder(filename, nimcache, 0)
+        const base_filename = fmt"{default_cache_folder}/coco_{basename}.c"
     teardown:
         removeDir(coverage)
         removeDir(nimcache)

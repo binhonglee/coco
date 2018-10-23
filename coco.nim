@@ -74,11 +74,11 @@ proc cleanup_report*(fileinfo = fileinfo, cov: string, verbose=false, branch=fal
     ## Keeps only relevant coverage informations
     ##      Without any cleanup, your code coverage report will include standard libraries, tests and so on.
     
-    var lcov_args = build_lcov_args(verbose, branch)
-    var options: GlobOptions = {GlobOption.Directories, GlobOption.Absolute}
+    let lcov_args = build_lcov_args(verbose, branch)
+    const options: GlobOptions = {GlobOption.Directories, GlobOption.Absolute}
     
     # Remove standard lib and nimble pkgs informations
-    var currentFolder = absolutePath("")
+    let currentFolder = absolutePath("")
     exec(fmt"""lcov {lcov_args} --extract {fileinfo} "{currentFolder}*" -o {fileinfo}""")
 
     for pattern in cov.split(","):
@@ -113,11 +113,11 @@ proc coverage*(target="tests/**/*.nim", cov="!tests", verbose=false, branch=fals
     ##
     reset_coverage(report_source, report_path, nimcache)
 
-    var targets = target.split(",")
+    let targets = target.split(",")
     for target in targets:
         compile(target, nimcache, verbose, compiler)
     
-    var lcov_args = build_lcov_args(verbose, branch)
+    let lcov_args = build_lcov_args(verbose, branch)
 
     exec(fmt"lcov {lcov_args} --base-directory . --directory {nimcache} --zerocounters -q")
     for target in targets:
@@ -133,7 +133,6 @@ proc coverage*(target="tests/**/*.nim", cov="!tests", verbose=false, branch=fals
 
 when isMainModule:
     import cligen
-
     dispatch(coverage, 
         help = {
         "target": "Nim files to compile and run in coverage mode. Direct path or glob patterns.",

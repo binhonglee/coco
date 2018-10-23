@@ -3,14 +3,14 @@ import unittest, os, system, strformat, ../../coco
 suite "Removes past code coverage reports and data":
 
     setup:
-        var fileinfo = "test.info"
-        var nimcache = "tests_nimcache"
-        var coverage = "tests_coverage"
+        const fileinfo = "test.info"
+        const nimcache = "tests_nimcache"
+        const coverage = "tests_coverage"
 
-        var basename = "foo"
-        var filename = fmt"{basename}.nim"
-        var default_cache_folder = get_cache_folder(filename, nimcache, 0)
-        var base_filename = fmt"{default_cache_folder}/coco_{basename}.c"
+        const basename = "foo"
+        const filename = fmt"{basename}.nim"
+        const default_cache_folder = get_cache_folder(filename, nimcache, 0)
+        const base_filename = fmt"{default_cache_folder}/coco_{basename}.c"
     
     teardown:
         removeDir(coverage)

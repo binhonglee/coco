@@ -3,11 +3,11 @@ import unittest, glob, os, strformat, ../coco
 suite "Compiles Nim files in coverage mode":
 
     setup:
-        var nimcache = "tests_nimcache"
-        var basename = "foo"
-        var filename = fmt"{basename}.nim"
-        var default_cache_folder = get_cache_folder(filename, nimcache, 0)
-        var base_filename = fmt"{default_cache_folder}/coco_{basename}.c"
+        const nimcache = "tests_nimcache"
+        const basename = "foo"
+        const filename = fmt"{basename}.nim"
+        const default_cache_folder = get_cache_folder(filename, nimcache, 0)
+        const base_filename = fmt"{default_cache_folder}/coco_{basename}.c"
     teardown:
         removeDir(nimcache)
 
