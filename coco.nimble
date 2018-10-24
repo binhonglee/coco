@@ -6,13 +6,9 @@ version       = "0.0.3"
 author        = "Samuel Roy"
 description   = "Code coverage with line and branch support for Nim"
 license       = "MIT"
+
+installFiles= @["coco.nim"]
 bin = @["coco"]
-
-
-skipDirs = @["tests","tests/report"]
-installExt = @["nim"]
-
-
 
 # Deps
 
