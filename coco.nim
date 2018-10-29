@@ -99,7 +99,7 @@ proc genhtml*(source=fileinfo, path=report_path, verbose=false, branch=false) =
     if branch:
         lcov_args &= " --branch-coverage"
     ## Generate LCOV Html report
-    exec(fmt"genhtml {lcov_args} -o {path} {source}")
+    exec(fmt"genhtml {lcov_args} --legend -o {path} {source}")
 
 proc coverage*(target="tests/**/*.nim", cov="!tests", verbose=false, branch=false, nimcache=nimcache_default, report_source=fileinfo, report_path=report_path, compiler=""): int =
     ## ____
