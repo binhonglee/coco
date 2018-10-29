@@ -146,7 +146,6 @@ when isMainModule:
         },
         short = {
         "report_source": 's',
-        "report_path": 'p',
-        "compiler": 'o'
+        "report_path": 'p'
         }
     ) 
