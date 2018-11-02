@@ -17,7 +17,7 @@ ___
 Install using [Nimble](https://github.com/nim-lang/nimble):
 
 ```shell
-nimble install https://github.com/samuelroy/coco
+nimble install coco
 ```
 
 ### CLI
