@@ -11,6 +11,9 @@ const nimcache_default = "nimcache"
 const fileinfo = "lcov.info"
 const report_path = "coverage"
 
+# Workaround for #12376 (https://github.com/nim-lang/Nim/issues/12376)
+const generated_not_to_break_here = "generated_not_to_break_here"
+
 proc exec(command: string) =
     ## Wrapper around execShellCmd that exits if the command fail
     doAssert execShellCmd(command) == 0, "command failed: " & command
@@ -80,11 +83,14 @@ proc cleanup_report*(fileinfo = fileinfo, cov: string, verbose=false, branch=fal
     # Remove standard lib and nimble pkgs informations
     let currentFolder = absolutePath("")
     exec(fmt"""lcov {lcov_args} --extract {fileinfo} "{currentFolder}*" -o {fileinfo}""")
+    exec(fmt"""lcov {lcov_args} --remove {fileinfo} "{currentFolder}/{generated_not_to_break_here}" -o {fileinfo}""")
 
     for pattern in cov.split(","):
         if pattern.startsWith("!"):
             var pattern_noprefix = pattern
             removePrefix(pattern_noprefix, "!")
+            if existsFile(pattern_noprefix):
+                exec(fmt"""lcov {lcov_args} --remove {fileinfo} "{currentFolder}/{pattern_noprefix}" -o {fileinfo}""")
             for path in walkGlob(pattern_noprefix, "", options):
                 exec(fmt"""lcov {lcov_args} --remove {fileinfo} "{path}*" -o {fileinfo}""")
         else:
@@ -101,7 +107,7 @@ proc genhtml*(source=fileinfo, path=report_path, verbose=false, branch=false) =
     ## Generate LCOV Html report
     exec(fmt"genhtml {lcov_args} --legend -o {path} {source}")
 
-proc coverage*(target="tests/**/*.nim", cov="!tests", verbose=false, branch=false, nimcache=nimcache_default, report_source=fileinfo, report_path=report_path, compiler=""): int =
+proc coverage*(target="tests/**/*.nim", cov="!tests", verbose=false, branch=false, nimcache=nimcache_default, report_source=fileinfo, report_path=report_path, compiler="", gen_html=true): int =
     ## ____
     ## 
     ## Code coverage for Nim:
@@ -118,15 +124,24 @@ proc coverage*(target="tests/**/*.nim", cov="!tests", verbose=false, branch=fals
         compile(target, nimcache, verbose, compiler)
     
     let lcov_args = build_lcov_args(verbose, branch)
+    writeFile(generated_not_to_break_here, "")
 
     exec(fmt"lcov {lcov_args} --base-directory . --directory {nimcache} --zerocounters -q")
+
+    echo "Running tests..."
     for target in targets:
         trace(target)
-   
-    exec(fmt"lcov {lcov_args}  --base-directory . --directory {nimcache} -c -o {report_source}")
 
+    echo "Preparing coverage report..."
+    exec(fmt"lcov {lcov_args} --base-directory . --directory {nimcache} -c -o {report_source}")
+    removeFile(generated_not_to_break_here)
+
+    echo "Cleaning up report..."
     cleanup_report(report_source, cov, verbose, branch)
-    genhtml(report_source, report_path, verbose, branch)
+
+    if gen_html:
+        echo "Generating html..."
+        genhtml(report_source, report_path, verbose, branch)
 
     result = 0
 
@@ -142,7 +157,8 @@ when isMainModule:
         "nimcache": "Nimcache path used by the Nim compiler",
         "report_source": "Path used by LCOV to generate the file .info",
         "report_path": "Folder path where the HTML code coverage report will be created",
-        "compiler": "Forward your parameter(s) to the Nim compiler"
+        "compiler": "Forward your parameter(s) to the Nim compiler",
+        "gen_html": "Create a html readable version of the code coverage"
         },
         short = {
         "report_source": 's',

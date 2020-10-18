@@ -32,4 +32,7 @@ Temporary Items
 ### Nim ###
 nimcache/
 
+# Binary
+coco
+
 # End of https://www.gitignore.io/api/macos
